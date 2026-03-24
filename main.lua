@@ -1734,14 +1734,17 @@ function OrionLib:MakeWindow(WindowConfig)
 		Content = "New UI Library Available at sirius.menu/discord and sirius.menu/rayfield",
 		Time = 5
 	})
-	
 
-	
-	return TabFunction
-end   
+	-- Force open/bring-to-front as safety net in restricted environments
+	if MainWindow then
+		MainWindow.Visible = true
+		MainWindow.ZIndex = 9999
+		Orion.Enabled = true
+		print("Xeno.lua: MainWindow forced visible, position", tostring(MainWindow.Position), "size", tostring(MainWindow.Size))
+	else
+		print("Xeno.lua: MainWindow is nil, window creation failed")
+	end
 
-function OrionLib:Destroy()
-	Orion:Destroy()
 end
 
 return OrionLib
