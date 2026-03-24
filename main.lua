@@ -51,22 +51,31 @@ Orion.Name = "Orion"
 Orion.ResetOnSpawn = false
 
 local OrionParent = nil
-if gethui then
+
+-- Xeno-compatible GUI parenting order
+if type(get_hidden_gui) == "function" then
+	OrionParent = get_hidden_gui()
+end
+
+if not OrionParent and type(gethui) == "function" then
 	OrionParent = gethui()
-elseif syn and syn.protect_gui then
+end
+
+if not OrionParent and type(syn) == "table" and type(syn.protect_gui) == "function" then
 	pcall(function()
 		syn.protect_gui(Orion)
 	end)
 	OrionParent = game.CoreGui
-elseif get_hidden_gui then
-	OrionParent = get_hidden_gui()
-else
+end
+
+if not OrionParent then
 	OrionParent = game.CoreGui
 end
+
 Orion.Parent = OrionParent
 
 pcall(function()
-	local parent = (gethui and gethui()) or game.CoreGui
+	local parent = (type(get_hidden_gui) == "function" and get_hidden_gui()) or (gethui and gethui()) or game.CoreGui
 	for _, Interface in ipairs(parent:GetChildren()) do
 		if Interface.Name == Orion.Name and Interface ~= Orion then
 			Interface:Destroy()
