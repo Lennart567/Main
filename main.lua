@@ -49,6 +49,9 @@ end
 local Orion = Instance.new("ScreenGui")
 Orion.Name = "Orion"
 Orion.ResetOnSpawn = false
+Orion.IgnoreGuiInset = true
+Orion.DisplayOrder = 2147483647
+Orion.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local OrionParent = nil
 
@@ -481,6 +484,7 @@ function OrionLib:Init()
 end	
 
 function OrionLib:MakeWindow(WindowConfig)
+	print("Xeno.lua OrionLib:MakeWindow called", WindowConfig and WindowConfig.Name or "nil", "Orion parent:", tostring(Orion.Parent))
 	local FirstTab = true
 	local Minimized = false
 	local Loaded = false
@@ -730,7 +734,9 @@ function OrionLib:MakeWindow(WindowConfig)
 	end 
 
 	if WindowConfig.IntroEnabled then
+		print("Xeno.lua LoadSequence starting for", WindowConfig.Name)
 		LoadSequence()
+		print("Xeno.lua LoadSequence done, MainWindow.Visible =", tostring(MainWindow.Visible))
 	end	
 
 	local TabFunction = {}
