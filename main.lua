@@ -76,6 +76,7 @@ if not OrionParent then
 end
 
 Orion.Parent = OrionParent
+print("Xeno.lua Orion GUI parent set to", OrionParent and OrionParent.ClassName or "nil", OrionParent and OrionParent:GetFullName() or "")
 
 pcall(function()
 	local parent = (type(get_hidden_gui) == "function" and get_hidden_gui()) or (gethui and gethui()) or game.CoreGui
@@ -730,8 +731,12 @@ function OrionLib:MakeWindow(WindowConfig)
 			TweenService:Create(LoadSequenceLogo, TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -(LoadSequenceText.TextBounds.X/2), 0.5, 0)}):Play()
 			task.wait(0.3)
 			TweenService:Create(LoadSequenceText, TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-			task.wait(2)
-	end 
+			wait(2)
+			TweenService:Create(LoadSequenceText, TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 1}):Play()
+			MainWindow.Visible = true
+			LoadSequenceLogo:Destroy()
+			LoadSequenceText:Destroy()
+		end
 
 	if WindowConfig.IntroEnabled then
 		print("Xeno.lua LoadSequence starting for", WindowConfig.Name)
@@ -791,6 +796,9 @@ function OrionLib:MakeWindow(WindowConfig)
 			TabFrame.Title.TextTransparency = 0
 			TabFrame.Title.Font = Enum.Font.GothamBlack
 			Container.Visible = true
+			TabHolder.Visible = true
+			MainWindow.Visible = true
+			Orion.Enabled = true
 		end    
 
 		AddConnection(TabFrame.MouseButton1Click, function()
@@ -1739,12 +1747,25 @@ function OrionLib:MakeWindow(WindowConfig)
 	if MainWindow then
 		MainWindow.Visible = true
 		MainWindow.ZIndex = 9999
+		MainWindow.Active = true
 		Orion.Enabled = true
 		print("Xeno.lua: MainWindow forced visible, position", tostring(MainWindow.Position), "size", tostring(MainWindow.Size))
 	else
 		print("Xeno.lua: MainWindow is nil, window creation failed")
 	end
 
+	-- Ensure tab area is forced visible
+	if TabHolder then
+		TabHolder.Visible = true
+		TabHolder.ZIndex = 10000
+		print("Xeno.lua: TabHolder visible", tostring(TabHolder.Visible))
+	end
+
+	if WindowStuff then
+		WindowStuff.Visible = true
+	end
+
+	return TabFunction
 end
 
 return OrionLib
