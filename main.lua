@@ -1,5 +1,3 @@
-
-
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -504,6 +502,7 @@ function OrionLib:MakeWindow(WindowConfig)
 	WindowConfig.ShowIcon = WindowConfig.ShowIcon or false
 	WindowConfig.Icon = WindowConfig.Icon or "rbxassetid://8834748103"
 	WindowConfig.IntroIcon = WindowConfig.IntroIcon or "rbxassetid://8834748103"
+	WindowConfig.DiscordLink = WindowConfig.DiscordLink or nil
 	OrionLib.Folder = WindowConfig.ConfigFolder
 	OrionLib.SaveCfg = WindowConfig.SaveConfig
 
@@ -568,8 +567,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		}), "Stroke"), 
 		TabHolder,
 		SetChildren(SetProps(MakeElement("TFrame"), {
-			Size = UDim2.new(1, 0, 0, 50),
-			Position = UDim2.new(0, 0, 1, -50)
+			Size = UDim2.new(1, 0, 0, WindowConfig.DiscordLink and 65 or 50),
+			Position = UDim2.new(0, 0, 1, -65)
 		}), {
 			AddThemeObject(SetProps(MakeElement("Frame"), {
 				Size = UDim2.new(1, 0, 0, 1)
@@ -597,7 +596,7 @@ function OrionLib:MakeWindow(WindowConfig)
 			}),
 			AddThemeObject(SetProps(MakeElement("Label", LocalPlayer.DisplayName, WindowConfig.HidePremium and 14 or 13), {
 				Size = UDim2.new(1, -60, 0, 13),
-				Position = WindowConfig.HidePremium and UDim2.new(0, 50, 0, 19) or UDim2.new(0, 50, 0, 12),
+				Position = UDim2.new(0, 50, 0, 12),
 				Font = Enum.Font.GothamBold,
 				ClipsDescendants = true
 			}), "Text"),
@@ -605,7 +604,26 @@ function OrionLib:MakeWindow(WindowConfig)
 				Size = UDim2.new(1, -60, 0, 12),
 				Position = UDim2.new(0, 50, 1, -25),
 				Visible = not WindowConfig.HidePremium
-			}), "TextDark")
+			}), "TextDark"),
+			-- Discord Link Button (only shown if DiscordLink is provided)
+			WindowConfig.DiscordLink and SetChildren(SetProps(MakeElement("Button"), {
+				Size = UDim2.new(1, -20, 0, 25),
+				Position = UDim2.new(0, 10, 1, -30),
+				BackgroundTransparency = 0.8
+			}), {
+				AddThemeObject(MakeElement("Stroke"), "Stroke"),
+				AddThemeObject(SetProps(MakeElement("Label", "Join Discord", 12), {
+					Size = UDim2.new(1, 0, 1, 0),
+					Font = Enum.Font.GothamSemibold,
+					TextXAlignment = Enum.TextXAlignment.Center
+				}), "Text"),
+				SetProps(MakeElement("Image", "rbxassetid://7072706796"), {
+					Size = UDim2.new(0, 16, 0, 16),
+					Position = UDim2.new(0, 8, 0.5, 0),
+					AnchorPoint = Vector2.new(0, 0.5),
+					ImageColor3 = Color3.fromRGB(88, 101, 242)
+				})
+			}) or nil
 		}),
 	}), "Second")
 
@@ -627,13 +645,6 @@ function OrionLib:MakeWindow(WindowConfig)
 		Size = UDim2.new(0, 615, 0, 344),
 		ClipsDescendants = true
 	}), {
-		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
-		--	AnchorPoint = Vector2.new(0.5, 0.5),
-		--	Position = UDim2.new(0.5, 0, 0.5, 0),
-		--	Size = UDim2.new(1, 80, 1, 320),
-		--	ImageColor3 = Color3.fromRGB(33, 33, 33),
-		--	ImageTransparency = 0.7
-		--}),
 		SetChildren(SetProps(MakeElement("TFrame"), {
 			Size = UDim2.new(1, 0, 0, 50),
 			Name = "TopBar"
@@ -665,6 +676,37 @@ function OrionLib:MakeWindow(WindowConfig)
 		})
 		WindowIcon.Parent = MainWindow.TopBar
 	end	
+
+	-- Discord link functionality
+	if WindowConfig.DiscordLink then
+		local DiscordBtn = WindowStuff:FindFirstChildWhichIsA("Button")
+		if DiscordBtn then
+			AddConnection(DiscordBtn.MouseButton1Click, function()
+				if setclipboard then
+					setclipboard(WindowConfig.DiscordLink)
+					OrionLib:MakeNotification({
+						Name = "Discord Link",
+						Content = "Discord link copied to clipboard!",
+						Time = 3
+					})
+				else
+					OrionLib:MakeNotification({
+						Name = "Discord Link",
+						Content = "Discord link: " .. WindowConfig.DiscordLink,
+						Time = 5
+					})
+				end
+			end)
+
+			AddConnection(DiscordBtn.MouseEnter, function()
+				TweenService:Create(DiscordBtn, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.6}):Play()
+			end)
+
+			AddConnection(DiscordBtn.MouseLeave, function()
+				TweenService:Create(DiscordBtn, TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 0.8}):Play()
+			end)
+		end
+	end
 
 	AddDraggingFunctionality(DragPoint, MainWindow)
 
